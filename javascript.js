@@ -1,50 +1,79 @@
 const choices = ["rock", "paper", "scissors"];
-let score = 0;
+const buttons = document.querySelectorAll('button');
+let playerScore = 0;
+let computerScore = 0;
+
+let playerTotalScore = document.querySelector('#player-score');
+let computerTotalScore = document.querySelector('#computer-score');
+
+let playerChoiceDisplay = document.querySelector('#player-choice');
+let computerChoiceDisplay = document.querySelector('#computer-choice');
+
+let resultMessage = document.querySelector('#message');
+
+buttons.forEach((button) => {
+  button.addEventListener('click', () => {
+    let round = playRound(button.id);
+  });
+});
+
 
 function getComputerChoice() {
   let randChoiceIndex = Math.floor(Math.random() * 3);
   return choices[randChoiceIndex];
 }
 
-
-function getPlayerChoice() {
-  let playerChoice = prompt("Rock? Paper? Scissors?").toLowerCase();
-  while (!(choices.includes(playerChoice))) {
-    playerChoice = prompt("Please input rock, paper, or scissors.").toLowerCase();
-  }
-  return playerChoice;
-}
-
-
-function playRound() {
+function playRound(playerClick) {
   const computerWinCombos = ["rockscissors", "scissorspaper", "paperrock"];
+  let playerChoice = playerClick;
   let computerChoice = getComputerChoice();
-  let playerChoice = getPlayerChoice();
+  updateChoiceDisplay(playerChoice, computerChoice);
+
   while (computerChoice === playerChoice) {
-    computerChoice = getComputerChoice();
-    playerChoice = getPlayerChoice();
+    updateResultMessage("Tie", 0);
+    return 0;
   }
+
   if (computerWinCombos.includes(computerChoice + playerChoice)) {
-    console.log("Computer wins round");
-    return (-1);
+    computerScore +=1;
+    computerTotalScore.textContent = computerScore;
+    updateResultMessage("Computer", computerScore);
+    return (computerScore);
   } else {
-    console.log("Player wins round");
-    return (1);
+    playerScore += 1;
+    playerTotalScore.textContent = playerScore;
+    updateResultMessage("Player", playerScore);
+    return (playerScore);
   }
 }
 
-
-function game() {
-  for (let i = 0; i < 5; i++) {
-    console.log(score);
-    let round = playRound();
-    score += round;
-  }
-  if (score > 0) {
-    console.log("Player wins match!");
-  } else {
-    console.log("Computer wins match!")
-  }
+function updateChoiceDisplay(player, computer) {
+  playerChoiceDisplay.textContent = "Player chose: " + player;
+  computerChoiceDisplay.textContent = "Computer chose: " + computer;
 }
 
-game();
+function updateResultMessage(name, score) {
+  if (name == "Tie"){
+    resultMessage.textContent = "Tie.  Select again.";
+    return;
+  }
+
+  if (score < 7) {
+    resultMessage.textContent = name + " wins round!";
+  } else {
+    resultMessage.textContent = name + " wins match!";
+    setTimeout(restartGame, 1);
+  }
+  return
+}
+
+function restartGame() {
+  const promptSelection = confirm("Play again?");
+  if (promptSelection) {
+    location.reload();
+  } else {
+    buttons.forEach((button) => {
+      button.disabled = true;
+    });
+  }
+}
